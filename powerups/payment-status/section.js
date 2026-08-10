@@ -26,8 +26,21 @@
     return element;
   }
 
-  function disableButtons() {
-    actions.querySelectorAll("button").forEach(function (element) {
+  function amountInput(payment) {
+    const element = document.createElement("input");
+    element.type = "text";
+    element.inputMode = "numeric";
+    element.autocomplete = "off";
+    element.placeholder = "USD amount";
+    element.setAttribute("aria-label", "Payment amount in whole US dollars");
+    element.pattern = "[0-9]*";
+    element.value = payment ? String(payment.amountUsd) : "";
+    actions.appendChild(element);
+    return element;
+  }
+
+  function disableControls() {
+    actions.querySelectorAll("button, input").forEach(function (element) {
       element.disabled = true;
     });
   }
@@ -47,41 +60,58 @@
     }
   }
 
-  async function setPaymentStatus(nextStatus, buttonElement) {
-    disableButtons();
+  async function savePayment(payment, buttonElement, successMessage) {
+    disableControls();
     buttonElement.textContent = "Saving…";
 
     try {
-      await t.set("card", "shared", "paymentStatus", nextStatus);
-      showStatus(nextStatus ? "Payment status: " + rules.labelFor(nextStatus) + "." : "No payment tracked.");
-      actions.replaceChildren();
+      await t.set("card", "shared", "payment", payment);
       await t.alert({
-        message: nextStatus ? "Payment status set to " + rules.labelFor(nextStatus) + "." : "Payment flag removed.",
+        message: successMessage,
         display: "success",
         duration: 5,
       });
+      await render();
     } catch (error) {
-      showStatus(error.message || "The payment status could not be saved.", "error");
+      showStatus(error.message || "The payment could not be saved.", "error");
       await render();
     }
   }
 
-  function renderAdminActions(paymentStatus) {
-    if (paymentStatus !== rules.statuses.UNPAID) {
-      button("Mark Payment Due", "", function (event) {
-        setPaymentStatus(rules.statuses.UNPAID, event.currentTarget);
-      });
+  function saveAmount(payment, input, buttonElement) {
+    const amountUsd = rules.parseWholeDollarAmount(input.value);
+    if (!amountUsd) {
+      showStatus("Enter a whole USD amount, such as 125.", "error");
+      input.focus();
+      return;
     }
 
-    if (paymentStatus !== rules.statuses.PAID) {
+    const nextPayment = {
+      amountUsd: amountUsd,
+      paid: Boolean(payment && payment.paid),
+    };
+    savePayment(nextPayment, buttonElement, payment ? "Payment amount updated." : "Payment added as unpaid.");
+  }
+
+  function removePayment(buttonElement) {
+    savePayment(null, buttonElement, "Payment removed from this card.");
+  }
+
+  function renderAdminActions(payment) {
+    const input = amountInput(payment);
+    button(payment ? "Update Amount" : "Set Payment", "", function (event) {
+      saveAmount(payment, input, event.currentTarget);
+    });
+
+    if (payment && !payment.paid) {
       button("Mark Paid", "", function (event) {
-        setPaymentStatus(rules.statuses.PAID, event.currentTarget);
+        savePayment({ amountUsd: payment.amountUsd, paid: true }, event.currentTarget, "Payment marked as paid.");
       });
     }
 
-    if (paymentStatus) {
-      button("Remove Payment Flag", "secondary", function (event) {
-        setPaymentStatus(null, event.currentTarget);
+    if (payment) {
+      button("Remove Payment", "secondary", function (event) {
+        removePayment(event.currentTarget);
       });
     }
   }
@@ -89,8 +119,8 @@
   async function render() {
     try {
       actions.replaceChildren();
-      const paymentStatus = rules.normalize(await t.get("card", "shared", "paymentStatus", null));
-      showStatus("Payment status: " + rules.labelFor(paymentStatus) + ".", paymentStatus ? "" : "empty");
+      const payment = rules.normalize(await t.get("card", "shared", "payment", null));
+      showStatus(rules.panelLabelFor(payment) + ".", payment ? "" : "empty");
 
       if (!t.memberCanWriteToModel("card")) {
         return;
@@ -120,7 +150,7 @@
         return;
       }
 
-      renderAdminActions(paymentStatus);
+      renderAdminActions(payment);
     } catch (error) {
       actions.replaceChildren();
       showStatus(error.message || "Payment status could not be loaded.", "error");

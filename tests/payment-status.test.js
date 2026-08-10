@@ -3,23 +3,31 @@ const assert = require("node:assert/strict");
 const rules = require("../powerups/shared/payment-status-rules.js");
 const paymentApi = require("../powerups/shared/trello-payment-api.js");
 
-test("payment status recognizes only unpaid and paid", function () {
-  assert.equal(rules.normalize(rules.statuses.UNPAID), rules.statuses.UNPAID);
-  assert.equal(rules.normalize(rules.statuses.PAID), rules.statuses.PAID);
-  assert.equal(rules.normalize("untracked"), null);
-  assert.equal(rules.normalize(null), null);
+test("payment amounts accept positive whole US dollars only", function () {
+  assert.equal(rules.parseWholeDollarAmount("125"), 125);
+  assert.equal(rules.parseWholeDollarAmount(" 2500 "), 2500);
+  assert.equal(rules.parseWholeDollarAmount("125.50"), null);
+  assert.equal(rules.parseWholeDollarAmount("0"), null);
+  assert.equal(rules.parseWholeDollarAmount("-125"), null);
+  assert.equal(rules.parseWholeDollarAmount("$125"), null);
 });
 
-test("payment status supplies the correct visible badge", function () {
-  assert.deepEqual(rules.detailsFor(rules.statuses.UNPAID), { text: "Payment Due", color: "red" });
-  assert.deepEqual(rules.detailsFor(rules.statuses.PAID), { text: "Paid", color: "green" });
+test("payment badges are absent until an amount exists", function () {
+  assert.equal(rules.normalize(null), null);
+  assert.equal(rules.normalize({ paid: false }), null);
   assert.equal(rules.detailsFor(null), null);
 });
 
-test("payment status presents a clear label for all states", function () {
-  assert.equal(rules.labelFor(rules.statuses.UNPAID), "Payment Due");
-  assert.equal(rules.labelFor(rules.statuses.PAID), "Paid");
-  assert.equal(rules.labelFor(null), "No payment tracked");
+test("unpaid payments show only a red whole-dollar price", function () {
+  const payment = rules.normalize({ amountUsd: 1250, paid: false });
+  assert.deepEqual(rules.detailsFor(payment), { text: "$1,250", color: "red" });
+  assert.equal(rules.panelLabelFor(payment), "$1,250 unpaid");
+});
+
+test("paid payments show only a green Paid badge", function () {
+  const payment = rules.normalize({ amountUsd: 1250, paid: true });
+  assert.deepEqual(rules.detailsFor(payment), { text: "Paid", color: "green" });
+  assert.equal(rules.panelLabelFor(payment), "Paid");
 });
 
 test("only a Workspace membership with the admin role can manage payments", function () {

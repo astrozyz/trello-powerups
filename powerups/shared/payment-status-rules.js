@@ -7,34 +7,66 @@
 })(typeof window !== "undefined" ? window : globalThis, function () {
   "use strict";
 
-  const statuses = Object.freeze({
-    UNPAID: "unpaid",
-    PAID: "paid",
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
   });
 
-  const badgeDetails = Object.freeze({
-    [statuses.UNPAID]: Object.freeze({ text: "Payment Due", color: "red" }),
-    [statuses.PAID]: Object.freeze({ text: "Paid", color: "green" }),
-  });
-
-  function normalize(status) {
-    return Object.prototype.hasOwnProperty.call(badgeDetails, status) ? status : null;
+  function isWholeDollarAmount(amountUsd) {
+    return Number.isSafeInteger(amountUsd) && amountUsd > 0;
   }
 
-  function detailsFor(status) {
-    const normalized = normalize(status);
-    return normalized ? badgeDetails[normalized] : null;
+  function parseWholeDollarAmount(value) {
+    const text = String(value || "").trim();
+    if (!/^[1-9]\d*$/.test(text)) {
+      return null;
+    }
+
+    const amountUsd = Number(text);
+    return isWholeDollarAmount(amountUsd) ? amountUsd : null;
   }
 
-  function labelFor(status) {
-    const details = detailsFor(status);
-    return details ? details.text : "No payment tracked";
+  function normalize(payment) {
+    if (!payment || typeof payment !== "object" || !isWholeDollarAmount(payment.amountUsd)) {
+      return null;
+    }
+
+    return Object.freeze({
+      amountUsd: payment.amountUsd,
+      paid: payment.paid === true,
+    });
+  }
+
+  function formatUsd(amountUsd) {
+    return currencyFormatter.format(amountUsd);
+  }
+
+  function detailsFor(payment) {
+    const normalized = normalize(payment);
+    if (!normalized) {
+      return null;
+    }
+
+    return normalized.paid
+      ? Object.freeze({ text: "Paid", color: "green" })
+      : Object.freeze({ text: formatUsd(normalized.amountUsd), color: "red" });
+  }
+
+  function panelLabelFor(payment) {
+    const normalized = normalize(payment);
+    if (!normalized) {
+      return "No payment listed";
+    }
+
+    return normalized.paid ? "Paid" : formatUsd(normalized.amountUsd) + " unpaid";
   }
 
   return Object.freeze({
-    statuses: statuses,
-    normalize: normalize,
     detailsFor: detailsFor,
-    labelFor: labelFor,
+    formatUsd: formatUsd,
+    normalize: normalize,
+    panelLabelFor: panelLabelFor,
+    parseWholeDollarAmount: parseWholeDollarAmount,
   });
 });

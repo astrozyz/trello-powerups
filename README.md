@@ -18,7 +18,8 @@ Only the valid next step is shown:
 | Backlog | Move to Assigned |
 | Assigned | Start Work |
 | In Progress | Mark Completed, Mark Blocked |
-| Completed or Blocked | None |
+| Completed | None |
+| Blocked | Resume Work, Mark Completed |
 
 The list names are intentionally exact and case-sensitive. If a board has zero or more than one list with a required name, the move is refused with a clear message rather than choosing the wrong list.
 
@@ -40,7 +41,7 @@ The list names are intentionally exact and case-sensitive. If a board has zero o
 3. Set its connector URL to:
 
    ```text
-   https://YOUR-GITHUB-USERNAME.github.io/trello-powerups/powerups/workflow-mover/connector.html?v=202608100134
+   https://YOUR-GITHUB-USERNAME.github.io/trello-powerups/powerups/workflow-mover/connector.html?v=202608100140
    ```
 
 4. Enable the **Card Back Section** and **Card Badges** capabilities. The older **Card Buttons** capability is not used.

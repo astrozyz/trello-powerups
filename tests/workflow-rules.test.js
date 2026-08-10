@@ -15,10 +15,16 @@ test("workflow exposes both In Progress outcomes", function () {
   ]);
 });
 
-test("terminal lists and unknown lists have no actions", function () {
+test("Completed and unknown lists have no actions", function () {
   assert.deepEqual(rules.movesForList("Completed"), []);
-  assert.deepEqual(rules.movesForList("Blocked"), []);
   assert.deepEqual(rules.movesForList("Review"), []);
+});
+
+test("Blocked cards can resume work or be completed", function () {
+  assert.deepEqual(rules.movesForList("Blocked"), [
+    { destination: "In Progress", label: "Resume Work" },
+    { destination: "Completed", label: "Mark Completed" },
+  ]);
 });
 
 test("only specified transitions are allowed", function () {

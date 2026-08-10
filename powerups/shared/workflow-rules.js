@@ -15,7 +15,10 @@
       { destination: "Blocked", label: "Mark Blocked" },
     ]),
     Completed: Object.freeze([]),
-    Blocked: Object.freeze([]),
+    Blocked: Object.freeze([
+      { destination: "In Progress", label: "Resume Work" },
+      { destination: "Completed", label: "Mark Completed" },
+    ]),
   });
 
   function movesForList(listName) {
@@ -33,4 +36,3 @@
     isAllowedMove: isAllowedMove,
   });
 });
-

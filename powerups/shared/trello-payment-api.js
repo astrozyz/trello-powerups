@@ -32,13 +32,18 @@
   }
 
   function isWorkspaceAdminMembership(membership) {
-    return Boolean(membership && membership.orgMemberType === "admin");
+    return Boolean(membership && membership.memberType === "admin");
   }
 
   async function workspaceAccessForCurrentMember(t, config) {
-    const context = await Promise.all([t.board("id"), t.member("id")]);
+    const context = await Promise.all([t.board("idOrganization"), t.member("id")]);
     const board = context[0];
     const member = context[1];
+
+    if (!board.idOrganization) {
+      return "not-workspace-board";
+    }
+
     const restApi = await t.getRestApi();
     const token = await restApi.getToken();
 
@@ -48,7 +53,7 @@
 
     const memberships = await request(
       withCredentials(
-        "https://api.trello.com/1/boards/" + encodeURIComponent(board.id) + "/memberships?fields=idMember,orgMemberType",
+        "https://api.trello.com/1/organizations/" + encodeURIComponent(board.idOrganization) + "/memberships?fields=idMember,memberType",
         config.appKey,
         token
       ),

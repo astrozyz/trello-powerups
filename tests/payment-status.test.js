@@ -23,24 +23,24 @@ test("payment status presents a clear label for all states", function () {
 });
 
 test("only a Workspace membership with the admin role can manage payments", function () {
-  assert.equal(paymentApi.isWorkspaceAdminMembership({ orgMemberType: "admin" }), true);
-  assert.equal(paymentApi.isWorkspaceAdminMembership({ orgMemberType: "normal" }), false);
+  assert.equal(paymentApi.isWorkspaceAdminMembership({ memberType: "admin" }), true);
+  assert.equal(paymentApi.isWorkspaceAdminMembership({ memberType: "normal" }), false);
   assert.equal(paymentApi.isWorkspaceAdminMembership({}), false);
   assert.equal(paymentApi.isWorkspaceAdminMembership(null), false);
 });
 
-test("payment access checks the current member's Workspace role on the board", async function () {
+test("payment access checks the current member's role in the board's Workspace", async function () {
   const originalFetch = global.fetch;
   let requestedUrl;
   global.fetch = async function (url) {
     requestedUrl = url;
-    return new Response(JSON.stringify([{ idMember: "member-1", orgMemberType: "admin" }]), { status: 200 });
+    return new Response(JSON.stringify([{ idMember: "member-1", memberType: "admin" }]), { status: 200 });
   };
 
   try {
     const access = await paymentApi.workspaceAccessForCurrentMember(
       {
-        board: async function () { return { id: "board-1" }; },
+        board: async function () { return { idOrganization: "workspace-1" }; },
         member: async function () { return { id: "member-1" }; },
         getRestApi: async function () {
           return { getToken: async function () { return "token-1"; } };
@@ -51,11 +51,23 @@ test("payment access checks the current member's Workspace role on the board", a
 
     assert.equal(access, "admin");
     const url = new URL(requestedUrl);
-    assert.equal(url.pathname, "/1/boards/board-1/memberships");
-    assert.equal(url.searchParams.get("fields"), "idMember,orgMemberType");
+    assert.equal(url.pathname, "/1/organizations/workspace-1/memberships");
+    assert.equal(url.searchParams.get("fields"), "idMember,memberType");
     assert.equal(url.searchParams.get("key"), "key-1");
     assert.equal(url.searchParams.get("token"), "token-1");
   } finally {
     global.fetch = originalFetch;
   }
+});
+
+test("payment access rejects boards that do not belong to a Workspace", async function () {
+  const access = await paymentApi.workspaceAccessForCurrentMember(
+    {
+      board: async function () { return { idOrganization: null }; },
+      member: async function () { return { id: "member-1" }; },
+    },
+    { appKey: "key-1" }
+  );
+
+  assert.equal(access, "not-workspace-board");
 });

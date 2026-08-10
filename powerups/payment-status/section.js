@@ -110,6 +110,11 @@
         return;
       }
 
+      if (access === "not-workspace-board") {
+        showStatus("Payment Status needs a board that belongs to a Workspace.", "empty");
+        return;
+      }
+
       if (access !== "admin") {
         showStatus("Only Workspace admins can change payment status.", "empty");
         return;

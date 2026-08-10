@@ -59,7 +59,7 @@ On a member's first move, Trello asks for `read,write` access. Trello stores the
 
 Payment Status gives every board member a badge for cards marked **Payment Due** or **Paid**. A Workspace admin can use the card panel to mark a payment due, mark it paid, or remove the payment flag. Cards without a flag show no payment badge.
 
-The Power-Up checks the signed-in member's `orgMemberType` from the board's Trello membership data. It enables the payment controls only when that Workspace role is `admin`. This is a browser-side UI gate, not a server-enforced security boundary.
+The Power-Up checks the signed-in member's `memberType` from the board Workspace's Trello membership data. It enables the payment controls only when that Workspace role is `admin`. This is a browser-side UI gate, not a server-enforced security boundary.
 
 ## Register Payment Status in Trello
 

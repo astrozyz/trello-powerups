@@ -3,27 +3,26 @@
 
   const config = window.POWER_UP_CONFIG;
   const icon = "https://astrozyz.github.io/trello-powerups/assets/payment.svg";
-  const buildVersion = "202608100430";
+  const buildVersion = "202608100510";
 
   function configured() {
     return Boolean(config && config.appKey && config.appName && config.appAuthor);
   }
 
-  function cardButtons(t) {
+  function cardBackSection(t) {
     if (!configured() || !t.memberCanWriteToModel("card")) {
-      return [];
+      return null;
     }
 
-    return [{
+    return {
+      title: "Payment Status",
       icon: icon,
-      text: "Payment Status",
-      callback: function (t) {
-        return t.popup({
-          title: "Payment Status",
-          url: t.signUrl("./section.html?v=" + buildVersion),
-        });
+      content: {
+        type: "iframe",
+        url: t.signUrl("./section.html?v=" + buildVersion),
+        height: 128,
       },
-    }];
+    };
   }
 
   async function cardBadges(t) {
@@ -47,7 +46,7 @@
 
   window.TrelloPowerUp.initialize(
     {
-      "card-buttons": cardButtons,
+      "card-back-section": cardBackSection,
       "card-badges": cardBadges,
     },
     config

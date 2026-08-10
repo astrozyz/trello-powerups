@@ -57,7 +57,7 @@ On a member's first move, Trello asks for `read,write` access. Trello stores the
 
 ## Included Power-Up: Payment Status
 
-Payment Status keeps payment controls in the card's **Power-Ups** area, rather than the main card-details column. Every board member sees a payment badge after a Workspace admin enters a whole-dollar USD amount. Unpaid cards show the red amount, while paid cards show a green **Paid** badge. Cards without a payment show no badge. Workspace admins can set or update the amount, mark an unpaid payment as paid, or remove the payment.
+Payment Status adds a compact card-details section below Workflow Mover. Every board member sees a payment badge after a Workspace admin enters a whole-dollar USD amount. Unpaid cards show the red amount, while paid cards show a green **Paid** badge. Cards without a payment show no badge. Workspace admins can set or update the amount, mark an unpaid payment as paid, or remove the payment.
 
 The Power-Up checks the signed-in member's `memberType` from the board Workspace's Trello membership data. It enables the payment controls only when that Workspace role is `admin`. This is a browser-side UI gate, not a server-enforced security boundary.
 
@@ -67,10 +67,10 @@ The Power-Up checks the signed-in member's `memberType` from the board Workspace
 2. Set its connector URL to:
 
    ```text
-   https://astrozyz.github.io/trello-powerups/powerups/payment-status/connector.html?v=202608100430
+   https://astrozyz.github.io/trello-powerups/powerups/payment-status/connector.html?v=202608100510
    ```
 
-3. Enable the **Card Buttons** and **Card Badges** capabilities. Disable **Card Back Section** if it is currently enabled.
+3. Enable the **Card Back Section** and **Card Badges** capabilities. Disable **Card Buttons** if it is currently enabled.
 4. On the Power-Up's **API Key** tab, generate an API key and add this allowed origin:
 
    ```text

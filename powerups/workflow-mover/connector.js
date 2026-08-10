@@ -3,7 +3,7 @@
 
   const config = window.POWER_UP_CONFIG;
   const icon = "https://astrozyz.github.io/trello-powerups/assets/workflow.svg";
-  const buildVersion = "202608100141";
+  const buildVersion = "202608100430";
 
   function configured() {
     return Boolean(config && config.appKey && config.appName && config.appAuthor);
@@ -20,7 +20,7 @@
       content: {
         type: "iframe",
         url: t.signUrl("./section.html?v=" + buildVersion),
-        height: 138,
+        height: 84,
       },
     };
   }

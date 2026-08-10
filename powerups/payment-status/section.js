@@ -97,6 +97,14 @@
     savePayment(null, buttonElement, "Payment removed from this card.");
   }
 
+  async function resizeToContent() {
+    try {
+      await t.sizeTo("#payment-status");
+    } catch (error) {
+      // The panel remains usable if Trello closes its popup while it is resizing.
+    }
+  }
+
   function renderAdminActions(payment) {
     const input = amountInput(payment);
     button(payment ? "Update Amount" : "Set Payment", "", function (event) {
@@ -154,6 +162,8 @@
     } catch (error) {
       actions.replaceChildren();
       showStatus(error.message || "Payment status could not be loaded.", "error");
+    } finally {
+      await resizeToContent();
     }
   }
 

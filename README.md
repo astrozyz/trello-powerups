@@ -40,7 +40,7 @@ The list names are intentionally exact and case-sensitive. If a board has zero o
 2. Set its connector URL to:
 
    ```text
-   https://YOUR-GITHUB-USERNAME.github.io/trello-powerups/powerups/workflow-mover/connector.html?v=202608100140
+   https://YOUR-GITHUB-USERNAME.github.io/trello-powerups/powerups/workflow-mover/connector.html?v=202608101300
    ```
 
 3. Enable the **Card Back Section** and **Card Badges** capabilities. The older **Card Buttons** capability is not used.
@@ -67,7 +67,7 @@ The Power-Up checks the signed-in member's `memberType` from the board Workspace
 2. Set its connector URL to:
 
    ```text
-   https://astrozyz.github.io/trello-powerups/powerups/payment-status/connector.html?v=202608100510
+   https://astrozyz.github.io/trello-powerups/powerups/payment-status/connector.html?v=202608101300
    ```
 
 3. Enable the **Card Back Section** and **Card Badges** capabilities. Disable **Card Buttons** if it is currently enabled.

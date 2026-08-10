@@ -30,10 +30,20 @@
         display: "success",
         duration: 5,
       });
+      await resizeToContent();
     } catch (error) {
       button.disabled = false;
       button.textContent = "Try again";
       showStatus(error.message || "The card could not be moved.", "error");
+      await resizeToContent();
+    }
+  }
+
+  async function resizeToContent() {
+    try {
+      await t.sizeTo("#workflow-mover");
+    } catch (error) {
+      // Trello can close the card while a resize request is pending.
     }
   }
 
@@ -70,5 +80,10 @@
     }
   }
 
-  t.render(render);
+  async function renderAndResize() {
+    await render();
+    await resizeToContent();
+  }
+
+  t.render(renderAndResize);
 })();

@@ -52,7 +52,7 @@
     try {
       const restApi = await t.getRestApi();
       await restApi.authorize({ scope: "read" });
-      await render();
+      await renderAndResize();
     } catch (error) {
       buttonElement.disabled = false;
       buttonElement.textContent = "Connect Trello";
@@ -71,10 +71,10 @@
         display: "success",
         duration: 5,
       });
-      await render();
+      await renderAndResize();
     } catch (error) {
       showStatus(error.message || "The payment could not be saved.", "error");
-      await render();
+      await renderAndResize();
     }
   }
 
@@ -95,6 +95,14 @@
 
   function removePayment(buttonElement) {
     savePayment(null, buttonElement, "Payment removed from this card.");
+  }
+
+  async function resizeToContent() {
+    try {
+      await t.sizeTo("#payment-status");
+    } catch (error) {
+      // Trello can close the card while a resize request is pending.
+    }
   }
 
   function renderAdminActions(payment) {
@@ -157,5 +165,10 @@
     }
   }
 
-  t.render(render);
+  async function renderAndResize() {
+    await render();
+    await resizeToContent();
+  }
+
+  t.render(renderAndResize);
 })();

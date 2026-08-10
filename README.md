@@ -40,7 +40,7 @@ The list names are intentionally exact and case-sensitive. If a board has zero o
 3. Set its connector URL to:
 
    ```text
-   https://YOUR-GITHUB-USERNAME.github.io/trello-powerups/powerups/workflow-mover/connector.html
+   https://YOUR-GITHUB-USERNAME.github.io/trello-powerups/powerups/workflow-mover/connector.html?v=202608100130
    ```
 
 4. Enable the **Card Back Section** and **Card Badges** capabilities. The older **Card Buttons** capability is not used.

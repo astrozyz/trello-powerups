@@ -3,7 +3,7 @@
 
   const config = window.POWER_UP_CONFIG;
   const icon = "https://astrozyz.github.io/trello-powerups/assets/payment.svg";
-  const buildVersion = "202608100205";
+  const buildVersion = "202608100225";
 
   function configured() {
     return Boolean(config && config.appKey && config.appName && config.appAuthor);

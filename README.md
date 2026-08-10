@@ -67,7 +67,7 @@ The Power-Up checks the signed-in member's `memberType` from the board Workspace
 2. Set its connector URL to:
 
    ```text
-   https://astrozyz.github.io/trello-powerups/powerups/payment-status/connector.html?v=202608100205
+   https://astrozyz.github.io/trello-powerups/powerups/payment-status/connector.html?v=202608100225
    ```
 
 3. Enable the **Card Back Section** and **Card Badges** capabilities.

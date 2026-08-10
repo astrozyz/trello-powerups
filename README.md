@@ -4,7 +4,7 @@ A GitHub Pages site that hosts several independent Trello Power-Ups. Each Power-
 
 ## Included Power-Up: Workflow Mover
 
-Workflow Mover adds card-back buttons that enforce this workflow:
+Workflow Mover adds a visible panel on the opened card, above attachments, that enforces this workflow. It also shows the current stage as a small badge on the front of each card.
 
 ```text
 Backlog -> Assigned -> In Progress -> Completed
@@ -43,14 +43,15 @@ The list names are intentionally exact and case-sensitive. If a board has zero o
    https://YOUR-GITHUB-USERNAME.github.io/trello-powerups/powerups/workflow-mover/connector.html
    ```
 
-4. On the Power-Up's **API Key** tab, generate an API key and add this allowed origin:
+4. Enable the **Card Back Section** and **Card Badges** capabilities. The older **Card Buttons** capability is not used.
+5. On the Power-Up's **API Key** tab, generate an API key and add this allowed origin:
 
    ```text
    https://YOUR-GITHUB-USERNAME.github.io
    ```
 
-5. Copy the API key into `powerups/workflow-mover/config.js` as `appKey`, and set `appAuthor` to your name or organization. Commit and push that change so GitHub Pages publishes it.
-6. Enable Workflow Mover on a board whose lists are named `Backlog`, `Assigned`, `In Progress`, `Completed`, and `Blocked`.
+6. Copy the API key into `powerups/workflow-mover/config.js` as `appKey`, and set `appAuthor` to your name or organization. Commit and push that change so GitHub Pages publishes it.
+7. Enable Workflow Mover on a board whose lists are named `Backlog`, `Assigned`, `In Progress`, `Completed`, and `Blocked`.
 
 On a member's first move, Trello asks for `read,write` access. Trello stores the resulting user token in that member's private Power-Up data; do not add a token to this repository.
 
@@ -74,4 +75,3 @@ node --check powerups/workflow-mover/connector.js
 node --check powerups/workflow-mover/authorize.js
 node --test tests/workflow-rules.test.js
 ```
-

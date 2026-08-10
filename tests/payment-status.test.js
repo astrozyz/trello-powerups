@@ -1,0 +1,61 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const rules = require("../powerups/shared/payment-status-rules.js");
+const paymentApi = require("../powerups/shared/trello-payment-api.js");
+
+test("payment status recognizes only unpaid and paid", function () {
+  assert.equal(rules.normalize(rules.statuses.UNPAID), rules.statuses.UNPAID);
+  assert.equal(rules.normalize(rules.statuses.PAID), rules.statuses.PAID);
+  assert.equal(rules.normalize("untracked"), null);
+  assert.equal(rules.normalize(null), null);
+});
+
+test("payment status supplies the correct visible badge", function () {
+  assert.deepEqual(rules.detailsFor(rules.statuses.UNPAID), { text: "Payment Due", color: "red" });
+  assert.deepEqual(rules.detailsFor(rules.statuses.PAID), { text: "Paid", color: "green" });
+  assert.equal(rules.detailsFor(null), null);
+});
+
+test("payment status presents a clear label for all states", function () {
+  assert.equal(rules.labelFor(rules.statuses.UNPAID), "Payment Due");
+  assert.equal(rules.labelFor(rules.statuses.PAID), "Paid");
+  assert.equal(rules.labelFor(null), "No payment tracked");
+});
+
+test("only a Workspace membership with the admin role can manage payments", function () {
+  assert.equal(paymentApi.isWorkspaceAdminMembership({ orgMemberType: "admin" }), true);
+  assert.equal(paymentApi.isWorkspaceAdminMembership({ orgMemberType: "normal" }), false);
+  assert.equal(paymentApi.isWorkspaceAdminMembership({}), false);
+  assert.equal(paymentApi.isWorkspaceAdminMembership(null), false);
+});
+
+test("payment access checks the current member's Workspace role on the board", async function () {
+  const originalFetch = global.fetch;
+  let requestedUrl;
+  global.fetch = async function (url) {
+    requestedUrl = url;
+    return new Response(JSON.stringify([{ idMember: "member-1", orgMemberType: "admin" }]), { status: 200 });
+  };
+
+  try {
+    const access = await paymentApi.workspaceAccessForCurrentMember(
+      {
+        board: async function () { return { id: "board-1" }; },
+        member: async function () { return { id: "member-1" }; },
+        getRestApi: async function () {
+          return { getToken: async function () { return "token-1"; } };
+        },
+      },
+      { appKey: "key-1" }
+    );
+
+    assert.equal(access, "admin");
+    const url = new URL(requestedUrl);
+    assert.equal(url.pathname, "/1/boards/board-1/memberships");
+    assert.equal(url.searchParams.get("fields"), "idMember,orgMemberType");
+    assert.equal(url.searchParams.get("key"), "key-1");
+    assert.equal(url.searchParams.get("token"), "token-1");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});

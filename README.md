@@ -37,24 +37,50 @@ The list names are intentionally exact and case-sensitive. If a board has zero o
 ## Register Workflow Mover in Trello
 
 1. In [Trello's Power-Up admin portal](https://trello.com/apps/admin), create a Power-Up named **Workflow Mover**.
-2. Enable the **Card Buttons** capability.
-3. Set its connector URL to:
+2. Set its connector URL to:
 
    ```text
    https://YOUR-GITHUB-USERNAME.github.io/trello-powerups/powerups/workflow-mover/connector.html?v=202608100140
    ```
 
-4. Enable the **Card Back Section** and **Card Badges** capabilities. The older **Card Buttons** capability is not used.
-5. On the Power-Up's **API Key** tab, generate an API key and add this allowed origin:
+3. Enable the **Card Back Section** and **Card Badges** capabilities. The older **Card Buttons** capability is not used.
+4. On the Power-Up's **API Key** tab, generate an API key and add this allowed origin:
 
    ```text
    https://YOUR-GITHUB-USERNAME.github.io
    ```
 
-6. Copy the API key into `powerups/workflow-mover/config.js` as `appKey`, and set `appAuthor` to your name or organization. Commit and push that change so GitHub Pages publishes it.
-7. Enable Workflow Mover on a board whose lists are named `Backlog`, `Assigned`, `In Progress`, `Completed`, and `Blocked`.
+5. Copy the API key into `powerups/workflow-mover/config.js` as `appKey`, and set `appAuthor` to your name or organization. Commit and push that change so GitHub Pages publishes it.
+6. Enable Workflow Mover on a board whose lists are named `Backlog`, `Assigned`, `In Progress`, `Completed`, and `Blocked`.
 
 On a member's first move, Trello asks for `read,write` access. Trello stores the resulting user token in that member's private Power-Up data; do not add a token to this repository.
+
+## Included Power-Up: Payment Status
+
+Payment Status gives every board member a badge for cards marked **Payment Due** or **Paid**. A Workspace admin can use the card panel to mark a payment due, mark it paid, or remove the payment flag. Cards without a flag show no payment badge.
+
+The Power-Up checks the signed-in member's `orgMemberType` from the board's Trello membership data. It enables the payment controls only when that Workspace role is `admin`. This is a browser-side UI gate, not a server-enforced security boundary.
+
+## Register Payment Status in Trello
+
+1. In [Trello's Power-Up admin portal](https://trello.com/apps/admin), create a Power-Up named **Payment Status**.
+2. Set its connector URL to:
+
+   ```text
+   https://astrozyz.github.io/trello-powerups/powerups/payment-status/connector.html?v=202608100205
+   ```
+
+3. Enable the **Card Back Section** and **Card Badges** capabilities.
+4. On the Power-Up's **API Key** tab, generate an API key and add this allowed origin:
+
+   ```text
+   https://astrozyz.github.io
+   ```
+
+5. Copy the API key into `powerups/payment-status/config.js` as `appKey`, and replace `appAuthor` with your name or organization. Commit and push that change so GitHub Pages publishes it.
+6. Enable Payment Status on a board that belongs to the Workspace whose admins should manage payment flags.
+
+The first admin to use the panel connects Trello with `read` access. That access is used only to check the member's Workspace role. Payment status is saved as shared card Power-Up data, so everyone on the board sees the same badge.
 
 ## Add another Power-Up
 
@@ -74,5 +100,10 @@ node --check powerups/shared/workflow-rules.js
 node --check powerups/shared/trello-workflow-api.js
 node --check powerups/workflow-mover/connector.js
 node --check powerups/workflow-mover/authorize.js
+node --check powerups/shared/payment-status-rules.js
+node --check powerups/shared/trello-payment-api.js
+node --check powerups/payment-status/connector.js
+node --check powerups/payment-status/section.js
 node --test tests/workflow-rules.test.js
+node --test tests/payment-status.test.js
 ```

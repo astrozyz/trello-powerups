@@ -72,14 +72,17 @@
       throw new Error("This card was moved before the update could be applied. Try again.");
     }
 
+    const updateUrl = new URL("https://api.trello.com/1/cards/" + encodeURIComponent(card.id));
+    const cardUpdate = WorkflowRules.cardUpdateForDestination(destinationName, new Date());
+    updateUrl.searchParams.set("idList", destinationList.id);
+    Object.keys(cardUpdate).forEach(function (field) {
+      updateUrl.searchParams.set(field, cardUpdate[field]);
+    });
+
     return request(
-      withCredentials(
-        "https://api.trello.com/1/cards/" + encodeURIComponent(card.id) + "?idList=" + encodeURIComponent(destinationList.id),
-        config.appKey,
-        token
-      ),
+      withCredentials(updateUrl.toString(), config.appKey, token),
       { method: "PUT" },
-      "Trello could not move this card."
+      "Trello could not update this card."
     );
   }
 
@@ -87,4 +90,3 @@
     moveCard: moveCard,
   });
 });
-

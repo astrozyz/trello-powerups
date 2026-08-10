@@ -2,8 +2,8 @@
   "use strict";
 
   const config = window.POWER_UP_CONFIG;
-  const icon = "https://astrozyz.github.io/trello-powerups/assets/workflow.svg";
-  const buildVersion = "202608100141";
+  const icon = "https://astrozyz.github.io/trello-powerups/assets/payment.svg";
+  const buildVersion = "202608100205";
 
   function configured() {
     return Boolean(config && config.appKey && config.appName && config.appAuthor);
@@ -15,12 +15,12 @@
     }
 
     return {
-      title: "Workflow Mover",
+      title: "Payment Status",
       icon: icon,
       content: {
         type: "iframe",
         url: t.signUrl("./section.html?v=" + buildVersion),
-        height: 138,
+        height: 142,
       },
     };
   }
@@ -30,23 +30,17 @@
       return [];
     }
 
-    const currentList = await t.list("name");
-    const colors = {
-      Backlog: "light-gray",
-      Assigned: "blue",
-      "In Progress": "yellow",
-      Completed: "green",
-      Blocked: "red",
-    };
+    const paymentStatus = await t.get("card", "shared", "paymentStatus", null);
+    const details = window.PaymentStatusRules.detailsFor(paymentStatus);
 
-    if (!Object.prototype.hasOwnProperty.call(colors, currentList.name)) {
+    if (!details) {
       return [];
     }
 
     return [{
-      text: currentList.name,
+      text: details.text,
       icon: icon,
-      color: colors[currentList.name],
+      color: details.color,
     }];
   }
 

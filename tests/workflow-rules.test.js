@@ -31,3 +31,24 @@ test("only specified transitions are allowed", function () {
   assert.equal(rules.isAllowedMove("Assigned", "In Progress"), true);
   assert.equal(rules.isAllowedMove("Assigned", "Completed"), false);
 });
+
+test("Assigned cards are due one week after the move and are incomplete", function () {
+  assert.deepEqual(
+    rules.cardUpdateForDestination("Assigned", "2026-08-09T18:30:00.000Z"),
+    { due: "2026-08-16T18:30:00.000Z", dueComplete: false }
+  );
+});
+
+test("Completed cards are due at the move time and complete", function () {
+  assert.deepEqual(
+    rules.cardUpdateForDestination("Completed", "2026-08-09T18:30:00.000Z"),
+    { due: "2026-08-09T18:30:00.000Z", dueComplete: true }
+  );
+});
+
+test("Blocked cards keep their due date and become incomplete", function () {
+  assert.deepEqual(
+    rules.cardUpdateForDestination("Blocked", "2026-08-09T18:30:00.000Z"),
+    { dueComplete: false }
+  );
+});
